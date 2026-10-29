@@ -648,6 +648,9 @@ body.hp-scope {
 }
 .hp-spec-value--live { color: var(--hp-cyan); display: inline-flex; align-items: center; gap: 9px; }
 
+/* retired units — static muted grey, no pulse: the machine is archival */
+.hp-spec-value--retired { color: var(--hp-mute); }
+
 .hp-unit-cta {
     display: inline-flex;
     align-items: center;
