@@ -11,6 +11,7 @@ import { initHome } from './home';
 import { initTeamArchive } from './team-archive';
 import { initNetwork } from './network';
 import { initNexusNow } from './nexus-now';
+import { renderNowPreview } from './nn-preview';
 import { initContact } from './contact';
 
 // Register GSAP plugins
@@ -259,7 +260,6 @@ function initAllAnimations(): void {
   // Counter animations
   animateCounters();
 }
-
 /**
  * Application initialization
  */
@@ -268,6 +268,12 @@ function init(): void {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!prefersReducedMotion) {
     initAllAnimations();
+  } else {
+    // Reduced motion: RENDERING is not animation. The team archive
+    // mounts the roster and self-gates every animation on the media
+    // query (reduced()) — without this call the Team page rendered
+    // completely empty. Same convention as initNetwork / initContact.
+    initTeamArchive(lenis);
   }
   initVisualEffects();
 
@@ -281,6 +287,11 @@ function init(): void {
   // entrance choreography. Unconditional like initNetwork: rendering is not
   // animation; no #ct-root on other pages = no-op.
   initContact();
+
+  // NEXUS NOW preview strip (homepage) — renders the live teaser rows
+  // from the nexus-now data module. Rendering is not animation; no
+  // #hp-now-rows on other pages = no-op.
+  renderNowPreview();
 
   // Load the 3D explode viewer only on the Robots page (heavy three.js dep)
   if (document.getElementById('robot-3d-canvas')) {

@@ -1,241 +1,217 @@
 /**
- * NEXUS NOW DATA — Live operations feed data
+ * NEXUS NOW DATA — the live heartbeat of NEXUS Robotics.
  *
- * Contains current campaign information, operations queue, and field log entries.
- * This data powers the "NEXUS NOW" page showing active operations and ongoing updates.
+ * One data file drives the whole NEXUS NOW layer:
  *
- * REUSABLE CAMPAIGN ARCHITECTURE:
- * - Supports multiple campaign types (events, competitions, recruitment, etc.)
- * - KYNEX is the current active campaign
- * - Data structure allows easy campaign replacement and archiving
+ *   LIVE    — what the team is doing right now (status console rows)
+ *   STORIES — permanent retrospective pages for completed major
+ *             activities (KYNEX '26, LA CASA DE BOTS, … future events)
+ *   FIELD LOG — dated entries, newest first; the living timeline
+ *
+ * UPDATE GUIDE (no code changes needed):
+ *   - Change a status        → edit `status` / `phase` in LIVE_STATUS
+ *   - Recruitment cycle      → edit the recruitment entry (status:
+ *                             'OPEN' | 'CLOSED' | 'PLANNING')
+ *   - Surface a new accolade → edit LATEST_ACCOLADE, point its link at
+ *                             about.html#record (the permanent archive)
+ *   - Add a story            → add an entry to STORIES + create
+ *                             nexus-now/<slug>.html from story.html
+ *   - Post an update         → prepend an entry to FIELD_LOG
+ *
+ * FACTS SOURCES: KYNEX '26 rulebooks (SUMO / LINE FOLLOWER, in
+ * public/KYNEX-26 Material/), the official poster, site copy.
+ * No invented statistics — unknown outcomes are omitted.
  */
 
-export interface Phase {
-  name: string;
-  status: 'complete' | 'active' | 'pending';
+/* ================================================================== */
+/* LIVE — current team activity                                        */
+/* ================================================================== */
+
+export type LiveLevel = 'primary' | 'accent' | 'neutral' | 'dim';
+
+export interface LiveStatusItem {
+    /** row label shown in the status console ("CURRENT BUILD") */
+    label: string;
+    /** main readout ("ROBOCON '26") */
+    value: string;
+    /** status word with the indicator dot ("INTEGRATION") */
+    status: string;
+    /** indicator + word colour */
+    level: LiveLevel;
+    /** one-line explanation under the console */
+    note?: string;
+    /** optional outbound link (project page, achievements, contact…) */
+    link?: { text: string; url: string };
 }
 
-export interface Campaign {
-  id: string;
-  name?: string;
-  title: string;
-  status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' | 'ARCHIVED';
-  type?: 'competition' | 'recruitment' | 'event' | 'announcement';
-  tagline?: string;
-  description?: string;
-  date?: string;
-  prizePool?: string;
-  registrationLink?: string;
-  rulebookLink?: string;
-  image?: string;
-  phase?: string;
-  phases?: Phase[];
-  competitions?: Competition[];
-  parameters?: EventParameter[];
-  contacts?: Contact[];
+/** Robocon '26 internal development phases — status per site data */
+export const ROBOCON_2026_PHASES: Array<{ name: string; status: 'complete' | 'active' | 'pending' }> = [
+    { name: 'CONCEPT', status: 'complete' },
+    { name: 'PROTOTYPE', status: 'complete' },
+    { name: 'DEVELOPMENT', status: 'active' },
+    { name: 'TESTING', status: 'pending' },
+    { name: 'INTEGRATION', status: 'pending' },
+    { name: 'COMPETITION', status: 'pending' }
+];
+
+/**
+ * STATUS CONSOLE — the LIVE layer.
+ * Rows render top to bottom; first row is the hero readout.
+ */
+export const LIVE_STATUS: LiveStatusItem[] = [
+    {
+        label: 'CURRENT BUILD',
+        value: "ROBOCON '26",
+        status: 'DEVELOPMENT',
+        level: 'primary',
+        note: 'Competition robot in active development — prototype validated, systems being brought up for the arena.',
+        link: { text: 'VIEW PROJECT', url: '/robots.html' }
+    },
+    {
+        label: 'RECRUITMENT 2026–27',
+        value: 'JOIN THE TEAM',
+        status: 'OPEN',
+        level: 'accent',
+        note: 'Applications open across all five divisions — mechanical, electronics, embedded, automation and PR.',
+        link: { text: 'JOIN NEXUS', url: '/contact.html' }
+    },
+    {
+        label: 'LATEST ACCOLADE',
+        value: 'AIR 1',
+        status: 'MATHWORKS',
+        level: 'accent',
+        note: 'MathWorks Modelling Competition — national first rank.',
+        link: { text: 'VIEW ACHIEVEMENTS', url: '/about.html#record' }
+    },
+    {
+        label: 'NEXT OPERATION',
+        value: 'OUTREACH SEASON',
+        status: 'ACTIVE',
+        level: 'neutral',
+        note: 'Workshops and demos rolling out through the semester.',
+        link: undefined
+    }
+];
+
+/* ================================================================== */
+/* STORIES — permanent pages for completed major activities            */
+/* ================================================================== */
+
+export interface Story {
+    id: string;
+    /** story page route under /nexus-now/ */
+    url: string;
+    title: string;
+    /** one-word category tag shown on the card */
+    kind: 'COMPETITION' | 'WORKSHOP' | 'EVENT' | 'OPERATION';
+    /** completion stamp ("26 SEP 2026") */
+    date: string;
+    /** short factual standfirst (shown on the NEXUS NOW card) */
+    summary: string;
+    /** key stat pairs shown on the card */
+    stats: Array<{ k: string; v: string }>;
+    /** poster/hero image for the card */
+    image: string;
+    imageAlt: string;
 }
 
-export interface Competition {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  type: 'sumo' | 'line' | 'other';
-  registrationLink?: string;
-  rulebookLink?: string;
-}
+export const STORIES: Story[] = [
+    {
+        id: 'kynex-26',
+        url: '/nexus-now/kynex-26.html',
+        title: "KYNEX '26",
+        kind: 'COMPETITION',
+        date: '26 SEP 2026',
+        summary: 'Two robotics competitions — Robo Sumo and Line Following — in one arena. Built, inspected and fought in a single day.',
+        stats: [
+            { k: 'COMPETITIONS', v: '2' },
+            { k: 'PRIZE POOL', v: '₹69,000' },
+            { k: 'DOHYO', v: '7 FT' }
+        ],
+        image: '/KYNEX-26 Material/poster-900.webp',
+        imageAlt: "KYNEX '26 official poster — Robo Sumo and Line Following"
+    },
+    {
+        id: 'la-casa-de-bots',
+        url: '/nexus-now/la-casa-de-bots.html',
+        title: 'LA CASA DE BOTS',
+        kind: 'WORKSHOP',
+        date: '30 SEP 2026',
+        summary: 'Maze-solver workshop — from sensor fundamentals to a robot finding its own way out. Built and run by team members.',
+        stats: [
+            { k: 'FORMAT', v: 'WORKSHOP' },
+            { k: 'PROJECT', v: 'MAZE SOLVER' }
+        ],
+        image: '/Images/la-casa-poster-900.webp',
+        imageAlt: 'La Casa De Bots official poster — maze-solver workshop'
+    }
+];
 
-export interface EventParameter {
-  label: string;
-  value: string;
-}
-
-export interface Contact {
-  name: string;
-  phone: string;
-  email?: string;
-  role?: string;
-}
-
-export interface Operation {
-  id: string;
-  index: string;
-  title: string;
-  status: 'ACTIVE' | 'UPCOMING' | 'PLANNING' | 'COMPLETED';
-  shortDescription: string;
-  expandedDetails?: string;
-  date?: string;
-  location?: string;
-  cta?: { text: string; link: string };
-  image?: string;
-}
+/* ================================================================== */
+/* FIELD LOG — dated entries, NEWEST FIRST                             */
+/* ================================================================== */
 
 export interface FieldLogEntry {
-  date: string;
-  title: string;
-  description: string;
-  images?: string[];
-  links?: Array<{ text: string; url: string }>;
+    /** display stamp ("04 OCT 2026") */
+    date: string;
+    /** machine-sortable iso date for ordering checks */
+    iso: string;
+    title: string;
+    description: string;
+    /** tag colour level */
+    level?: LiveLevel;
+    /** internal link (story page or section anchor) */
+    link?: { text: string; url: string };
 }
 
-/**
- * Robocon 2026 Phases — used for internal development tracking
- */
-const ROBOCON_2026_PHASES: Phase[] = [
-  { name: 'CONCEPT', status: 'complete' },
-  { name: 'PROTOTYPE', status: 'complete' },
-  { name: 'DEVELOPMENT', status: 'active' },
-  { name: 'TESTING', status: 'pending' },
-  { name: 'INTEGRATION', status: 'pending' },
-  { name: 'COMPETITION', status: 'pending' }
-];
-
-/**
- * KYNEX CAMPAIGN — Current Active Event
- * Two robotics competitions: Robo Sumo and Line Following
- */
-export const KYNEX_CAMPAIGN: Campaign = {
-  id: 'kynex-2026',
-  name: 'KYNEX',
-  title: 'KYNEX',
-  status: 'ACTIVE',
-  type: 'competition',
-  tagline: 'TWO ROBOTICS COMPETITIONS. ONE EPIC EVENT.',
-  description: 'KYNEX brings two distinct robotics battles into one arena. Compete in Robo Sumo or Line Following, or enter both to become the ultimate champion.',
-  date: '26 SEPTEMBER 2026',
-  prizePool: 'UP TO ₹70,000',
-  registrationLink: 'https://scan.page/rTay6l',
-  rulebookLink: '#rulebooks',
-  competitions: [
-    {
-      id: 'sumo',
-      name: 'ROBO SUMO',
-      tagline: 'BUILD. PUSH. DOMINATE.',
-      description: 'Heavy mechanical combat where robots push opponents out of the ring. Requires torque, power and strategic engineering.',
-      type: 'sumo',
-      registrationLink: 'https://scan.page/rTay6l',
-      rulebookLink: '/KYNEX-26 Material/SUMO RULEBOOK.pdf'
-    },
-    {
-      id: 'line',
-      name: 'LINE FOLLOWING',
-      tagline: 'DETECT. DECIDE. MOVE.',
-      description: 'High-speed precision racing where robots follow complex tracks using sensors. Requires intelligence, speed and accuracy.',
-      type: 'line',
-      registrationLink: 'https://scan.page/rTay6l',
-      rulebookLink: '/KYNEX-26 Material/LINE FOLLOWER RULEBOOK.pdf'
-    }
-  ],
-  parameters: [
-    { label: 'DATE', value: '26 SEPTEMBER 2026' },
-    { label: 'PRIZE POOL', value: 'UP TO ₹70,000' },
-    { label: 'SINGLE ENTRY', value: '₹900' },
-    { label: 'DUAL ENTRY', value: '₹1,700' }
-  ],
-  contacts: [
-    {
-      name: 'Paarth Mehta',
-      phone: '+91 8169524405',
-      role: 'Event Coordinator'
-    },
-    {
-      name: 'Arpita Bhalekar',
-      phone: '+91 9321127041',
-      role: 'Event Coordinator'
-    }
-  ]
-};
-
-/**
- * Featured campaign — currently KYNEX event
- */
-export const FEATURED_CAMPAIGN: Campaign = KYNEX_CAMPAIGN;
-
-/**
- * Robocon 2026 Campaign — Separate ongoing internal project
- * (Not the featured campaign on Nexus Now page)
- */
-export const ROBOCON_2026: Campaign = {
-  id: 'robocon-2026',
-  name: 'ROBOCON',
-  title: 'ROBOCON 2026',
-  status: 'ACTIVE',
-  type: 'competition',
-  phase: 'DEVELOPMENT',
-  phases: ROBOCON_2026_PHASES,
-  image: '/assets/robocon-2026-hero.webp',
-  description: 'Active development of our competition robot for Robocon 2026. Our team is currently in the development phase, working on bringing the prototype to life with precision engineering and advanced systems integration.'
-};
-
-/**
- * Operations queue — current and upcoming operations
- */
-export const OPERATIONS: Operation[] = [
-  {
-    id: 'kynex-2026',
-    index: '01',
-    title: 'KYNEX 2026',
-    status: 'ACTIVE',
-    shortDescription: 'Two robotics competitions in one epic event.',
-    expandedDetails: 'KYNEX \'26 brings together Robo Sumo and Line Following competitions. Open to all robotics enthusiasts with prizes worth up to ₹70,000.',
-    date: '26 September 2026',
-    location: 'KJ Somaiya Vidyavihar University',
-    cta: { text: 'Register Now', link: 'https://scan.page/rTay6l' }
-  },
-  {
-    id: 'robocon-2026',
-    index: '02',
-    title: 'ROBOCON 2026',
-    status: 'ACTIVE',
-    shortDescription: 'Our main competition: development phase active.',
-    expandedDetails: 'Active development of our competition robot for Robocon 2026. Currently in development phase, working on prototype realization with precision engineering and advanced systems integration.',
-    date: 'March 2026',
-    cta: { text: 'View Progress', link: '#' }
-  },
-  {
-    id: 'recruitment-2026',
-    index: '03',
-    title: 'TEAM RECRUITMENT 2026',
-    status: 'PLANNING',
-    shortDescription: 'Annual recruitment drive for new team members across all departments.',
-    expandedDetails: 'Join the next generation of robotics innovators. We recruit passionate students in Mechanical Systems, Electronics, Embedded Systems, Automation, and PR & Marketing.',
-    date: 'August 2026',
-    cta: { text: 'Stay Updated', link: '#' }
-  }
-];
-
-/**
- * Field log — chronological updates (ongoing update system)
- */
 export const FIELD_LOG: FieldLogEntry[] = [
-  {
-    date: 'AUG 2025',
-    title: 'KYNEX LAUNCH',
-    description: 'NEXUS Robotics announces KYNEX \'26 — two robotics competitions (Robo Sumo and Line Following) with prizes worth up to ₹70,000. Registration open for all robotics enthusiasts.'
-  },
-  {
-    date: 'JUL 2025',
-    title: 'PROTOTYPE VALIDATION SUCCESSFUL',
-    description: 'The robot prototype successfully completed all validation tests. Key achievements include: successful autonomous navigation runs, precision manipulation tasks, and robust power management system performance.'
-  },
-  {
-    date: 'JUN 2025',
-    title: 'NEW GENERATION TEAM ESTABLISHED',
-    description: 'The 2025 team structure has been finalized with leadership appointments across all departments. Core leadership team is now driving the Robocon development phase.'
-  },
-  {
-    date: 'MAY 2025',
-    title: 'NEXUS REBRAND COMPLETE',
-    description: 'Team successfully rebranded to NEXUS Robotics with new visual identity and enhanced technical capabilities. Brand refresh includes updated engineering aesthetics and streamlined operational structure.'
-  }
+    {
+        date: '04 OCT 2026',
+        iso: '2026-10-04',
+        title: 'RECRUITMENT EXTENDED',
+        description: 'The 2026–27 recruitment window stays open — applications across all five divisions are still being accepted.',
+        level: 'accent',
+        link: { text: 'JOIN NEXUS', url: '/contact.html' }
+    },
+    {
+        date: '30 SEP 2026',
+        iso: '2026-09-30',
+        title: 'LA CASA DE BOTS — WORKSHOP COMPLETE',
+        description: 'The maze-solver workshop closed out the September operations. Participants took robots from bare sensors to a full maze escape.',
+        level: 'primary',
+        link: { text: 'READ THE STORY', url: '/nexus-now/la-casa-de-bots.html' }
+    },
+    {
+        date: '26 SEP 2026',
+        iso: '2026-09-26',
+        title: "KYNEX '26 — EVENT COMPLETE",
+        description: 'Both arenas ran full schedules — Sumo on the 7 ft Dohyo, Line Followers on the confidential track. The event is now a permanent story.',
+        level: 'primary',
+        link: { text: 'READ THE STORY', url: '/nexus-now/kynex-26.html' }
+    },
+    {
+        date: 'SEP 2026',
+        iso: '2026-09-15',
+        title: 'ROBOCON ’26 — DEVELOPMENT PHASE',
+        description: 'The competition robot moved into its development phase — prototype validated, systems being brought up for the arena.',
+        level: 'neutral'
+    },
+    {
+        date: 'SEP 2026',
+        iso: '2026-09-08',
+        title: 'AIR 1 — MATHWORKS MODELLING',
+        description: 'First rank at the MathWorks Modelling Competition — the latest entry in the team record.',
+        level: 'accent',
+        link: { text: 'VIEW ACHIEVEMENTS', url: '/about.html#record' }
+    }
 ];
 
+/* Legacy named export kept for the homepage preview module. */
 export const NEXUS_NOW_DATA = {
-  featuredCampaign: FEATURED_CAMPAIGN,
-  kynexCampaign: KYNEX_CAMPAIGN,
-  roboconCampaign: ROBOCON_2026,
-  operations: OPERATIONS,
-  fieldLog: FIELD_LOG
+    liveStatus: LIVE_STATUS,
+    stories: STORIES,
+    fieldLog: FIELD_LOG,
+    roboconPhases: ROBOCON_2026_PHASES
 };
 
 export default NEXUS_NOW_DATA;

@@ -31,8 +31,8 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Department subpages resolve to their parent nav item (TEAM),
- * so the active state and metadata stay correct on every route.
+ * Department subpages and NEXUS NOW story pages resolve to their parent
+ * nav item, so the active state and metadata stay correct on every route.
  */
 const SUBPAGE_ALIASES: Record<string, string> = {
     'mechanical.html': 'team.html',
@@ -41,6 +41,9 @@ const SUBPAGE_ALIASES: Record<string, string> = {
     'image-processing.html': 'team.html',  // legacy slug → Automation dept now at automation.html
     'automation.html': 'team.html',
     'management.html': 'team.html',
+    // NEXUS NOW stories — children of the live-operations section
+    'kynex-26.html': 'nexus-now.html',
+    'la-casa-de-bots.html': 'nexus-now.html',
 };
 
 export interface NavState {

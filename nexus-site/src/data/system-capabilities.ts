@@ -5,8 +5,20 @@
  * Contains descriptions, capabilities, tools, and team associations for each system.
  */
 
-import type { DeptKey } from './team-data';
+import type { DeptKey, TeamYear } from './team-data';
 import { TEAMS } from './team-data';
+
+/**
+ * Active roster source — the public Team page swaps this to the
+ * database roster once a successful query returns data. Defaults to
+ * the static team-data so the page works before Supabase is set up.
+ */
+let activeTeams: Record<number, TeamYear> = TEAMS;
+
+/** called by team-archive.ts when the database roster loads */
+export function setActiveRosterSource(teams: Record<number, TeamYear>): void {
+  activeTeams = teams;
+}
 
 export interface SystemCapability {
   name: string;
@@ -37,8 +49,8 @@ const mechanicalCapability: SystemCapability = {
   ],
   tools: ['SolidWorks', 'Fusion 360', 'AutoCAD', 'CATIA', 'ANSYS', '3D Printing (FDM/SLA)', 'CNC Machining', 'Laser Cutting', 'Welding & Fabrication'],
   getMembers: () => {
-    const members = [];
-    for (const yearData of Object.values(TEAMS)) {
+    const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+    for (const yearData of Object.values(activeTeams)) {
       for (const member of yearData.members) {
         if (member.departments.includes('mech')) {
           members.push({
@@ -69,8 +81,8 @@ const electronicsCapability: SystemCapability = {
   ],
   tools: ['Altium Designer', 'KiCad', 'Eagle PCB', 'LTspice', 'ARM Cortex', 'ESP32', 'STM32', 'Arduino', 'I2C, SPI, UART', 'CAN Bus', 'Bluetooth/WiFi', 'LoRa'],
   getMembers: () => {
-    const members = [];
-    for (const yearData of Object.values(TEAMS)) {
+    const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+    for (const yearData of Object.values(activeTeams)) {
       for (const member of yearData.members) {
         if (member.departments.includes('elec')) {
           members.push({
@@ -101,8 +113,8 @@ const embeddedCapability: SystemCapability = {
   ],
   tools: ['Python', 'C++', 'JavaScript/Node.js', 'MATLAB', 'OpenCV', 'TensorFlow/PyTorch', 'ROS/ROS2', 'NumPy/SciPy', 'Deep Learning', 'SLAM', 'Kalman Filters', 'Path Planning (A*, RRT)'],
   getMembers: () => {
-    const members = [];
-    for (const yearData of Object.values(TEAMS)) {
+    const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+    for (const yearData of Object.values(activeTeams)) {
       for (const member of yearData.members) {
         if (member.departments.includes('embed')) {
           members.push({
@@ -135,8 +147,8 @@ const automationCapability: SystemCapability = {
   ],
   tools: ['Python', 'C++ for Real-Time Systems', 'MATLAB & Simulink', 'ROS / ROS 2', 'OpenCV', 'YOLO & Object Detection Models', 'Kalman Filters & Tracking', 'TensorFlow / PyTorch', 'PID & State-Machine Control', 'Path Planning (A*, RRT)', 'SLAM & Localization', 'Sensor Fusion'],
   getMembers: () => {
-    const members = [];
-    for (const yearData of Object.values(TEAMS)) {
+    const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+    for (const yearData of Object.values(activeTeams)) {
       for (const member of yearData.members) {
         if (member.departments.includes('auto')) {
           members.push({
@@ -167,8 +179,8 @@ const prmCapability: SystemCapability = {
   ],
   tools: ['Adobe Creative Suite', 'Social Media Platforms', 'Content Management', 'Analytics Tools', 'Budget Planning', 'Expense Tracking', 'Sponsorship Proposals', 'Financial Reporting', 'Timeline Planning', 'Resource Allocation'],
   getMembers: () => {
-    const members = [];
-    for (const yearData of Object.values(TEAMS)) {
+    const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+    for (const yearData of Object.values(activeTeams)) {
       for (const member of yearData.members) {
         if (member.departments.includes('prm')) {
           members.push({
@@ -196,8 +208,8 @@ export const SYSTEM_CAPABILITIES: Record<DeptKey, SystemCapability> = {
     coreFunctions: ['Technical Guidance', 'Strategic Direction', 'Industry Connections', 'Project Oversight'],
     tools: ['Technical Consultation', 'Project Management', 'Industry Standards'],
     getMembers: () => {
-      const members = [];
-      for (const yearData of Object.values(TEAMS)) {
+      const members = [] as Array<{ name: string; role: string; photoBase?: string; objectPosition?: string }>;
+      for (const yearData of Object.values(activeTeams)) {
         for (const member of yearData.members) {
           if (member.departments.includes('mentor')) {
             members.push({

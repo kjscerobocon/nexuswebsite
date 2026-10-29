@@ -8,7 +8,7 @@
 export function createBrandModule(): string {
     return `
       <a class="gn-brand" href="index.html" aria-label="NEXUS ROBOTICS — home">
-        <img class="gn-brand-mark" src="/Images/Logo_without_text.webp" alt="">
+        <img class="gn-brand-mark" src="/Images/Nexus_logo.webp" alt="">
         <span class="gn-brand-word">
           <span class="gn-brand-name">NEXUS ROBOTICS</span>
           <span class="gn-brand-sub">KJ SOMAIYA · EST. 2010</span>

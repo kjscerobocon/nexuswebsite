@@ -554,10 +554,16 @@ body.hp-scope {
     padding: 0 var(--hp-pad);
 }
 
-/* media plate with engineering crop-marks — NOT a rounded card */
+/* media plate with engineering crop-marks — NOT a rounded card.
+   Frame aspect matches R3.jpeg (472x668 portrait) exactly, so the full
+   photo shows uncropped; width capped at 460px so the 472px-wide source
+   is never upscaled (upscale = the "compressed/distorted" look). */
 .hp-unit-media {
     position: relative;
-    aspect-ratio: 16 / 11;
+    aspect-ratio: 472 / 668;
+    width: 100%;
+    max-width: 460px;
+    justify-self: center;
     overflow: hidden;
 }
 
@@ -565,9 +571,9 @@ body.hp-scope {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 42%;
+    object-position: center;
     filter: saturate(0.85) contrast(1.06);
-    transform-origin: 50% 42%;
+    transform-origin: 50% 50%;
     will-change: transform;
 }
 
@@ -896,6 +902,143 @@ body.hp-scope {
     border: 1px solid var(--hp-hair-strong);
 }
 .hp-btn--ghost:hover { border-color: var(--hp-cyan); color: var(--hp-cyan); background: transparent; }
+
+/* ==========================================================================
+   NEXUS NOW — live preview strip (not a chapter; sits between 06 and 07)
+   ========================================================================== */
+
+.hp-now {
+    background: var(--hp-bg-2);
+    border-top: 1px solid var(--hp-hair);
+    border-bottom: 1px solid var(--hp-hair);
+    padding: clamp(56px, 9vh, 104px) 0;
+}
+
+.hp-now-inner {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 0 var(--hp-pad);
+}
+
+.hp-now-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: clamp(28px, 4vh, 44px);
+}
+
+.hp-now-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Numans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--hp-cyan);
+    margin-bottom: 16px;
+}
+
+.hp-now-title {
+    font-family: 'Kanit', sans-serif;
+    font-size: clamp(30px, 4.2vw, 54px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.5px;
+    color: var(--hp-ink);
+    margin: 0;
+}
+
+.hp-now-enter {
+    font-family: 'Numans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--hp-ink);
+    text-decoration: none;
+    border: 1px solid var(--hp-hair-strong);
+    padding: 14px 24px;
+    white-space: nowrap;
+    transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+
+.hp-now-enter:hover {
+    border-color: var(--hp-cyan);
+    color: var(--hp-cyan);
+    background: rgba(0, 217, 232, 0.05);
+}
+
+.hp-now-rows { border-top: 1px solid var(--hp-hair); }
+
+.hp-now-row {
+    display: grid;
+    grid-template-columns: minmax(150px, 320px) 1fr auto 20px;
+    align-items: center;
+    column-gap: clamp(16px, 2.5vw, 40px);
+    padding: clamp(18px, 3vh, 26px) 0;
+    border-bottom: 1px solid var(--hp-hair);
+    text-decoration: none;
+    color: var(--hp-ink);
+    transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+.hp-now-row:hover { padding-left: 14px; }
+
+.hp-now-row-label {
+    font-family: 'Numans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--hp-mute);
+    transition: color 0.3s ease;
+}
+
+.hp-now-row:hover .hp-now-row-label { color: var(--hp-cyan); }
+
+.hp-now-row-rule {
+    height: 1px;
+    background: var(--hp-hair);
+    transition: background 0.3s ease;
+}
+
+.hp-now-row:hover .hp-now-row-rule { background: var(--hp-hair-strong); }
+
+.hp-now-row-value {
+    font-family: 'Kanit', sans-serif;
+    font-size: clamp(15px, 1.6vw, 20px);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--hp-ink);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hp-now-row-go {
+    font-family: 'Numans', sans-serif;
+    font-size: 14px;
+    color: var(--hp-mute);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.hp-now-row:hover .hp-now-row-go {
+    color: var(--hp-cyan);
+    transform: translateX(4px);
+}
+
+@media (max-width: 720px) {
+    .hp-now-head { align-items: flex-start; flex-direction: column; }
+    .hp-now-row {
+        grid-template-columns: 1fr 20px;
+        row-gap: 6px;
+    }
+    .hp-now-row-label { grid-column: 1 / -1; }
+    .hp-now-row-rule { display: none; }
+    .hp-now-row-value { text-align: left; font-size: 15px; }
+}
 
 /* ==========================================================================
    RECURRING INSTRUMENT — chapter progress, fixed bottom-left

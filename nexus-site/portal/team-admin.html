@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Roster Command | NEXUS ROBOTICS</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Numans:wght@400;700&family=Kanit:wght@400;500;600;700&family=Martel+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/team-admin.css">
+</head>
+<body>
+
+    <div class="ta-admin-root">
+        <!-- ================= SIGN-IN ================= -->
+        <section class="ta-admin-login" id="view-login" hidden>
+            <div class="ta-admin-card ta-admin-card--login">
+                <div class="ta-admin-label">RESTRICTED // TEAM ROSTER COMMAND</div>
+                <h1 class="ta-admin-title">ADMIN ACCESS</h1>
+                <p class="ta-admin-sub">Authorized personnel only. Sign in with your NEXUS admin account — access is granted by the database allow-list, not by this page.</p>
+
+                <form class="ta-admin-form" id="login-form" novalidate>
+                    <div class="ta-field">
+                        <label class="ta-field-label" for="login-email">EMAIL</label>
+                        <input class="ta-input" type="email" id="login-email" name="email" autocomplete="username" required>
+                    </div>
+                    <div class="ta-field">
+                        <label class="ta-field-label" for="login-password">PASSWORD</label>
+                        <input class="ta-input" type="password" id="login-password" name="password" autocomplete="current-password" required>
+                    </div>
+                    <div class="ta-alert ta-alert--error" id="login-error" role="alert" hidden></div>
+                    <button class="ta-btn ta-btn--primary" type="submit" id="login-submit">
+                        <span class="ta-btn-label">AUTHENTICATE</span>
+                    </button>
+                </form>
+
+                <div class="ta-admin-footnote">
+                    <a href="/index.html" class="ta-admin-back">← RETURN TO SITE</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONSOLE ================= -->
+        <section class="ta-admin-console" id="view-console" hidden>
+            <header class="ta-admin-header">
+                <div>
+                    <div class="ta-admin-label">TEAM ROSTER COMMAND</div>
+                    <h1 class="ta-admin-title">ROSTER CONSOLE</h1>
+                    <div class="ta-admin-userline" id="admin-userline"></div>
+                </div>
+                <div class="ta-admin-actions">
+                    <a class="ta-btn ta-btn--ghost" href="/team.html" target="_blank" rel="noopener">VIEW PUBLIC PAGE ↗</a>
+                    <button class="ta-btn ta-btn--ghost" type="button" id="btn-signout">SIGN OUT</button>
+                </div>
+            </header>
+
+            <div class="ta-admin-statusbar" id="status-bar" role="status" aria-live="polite">
+                <span class="ta-dot-live" aria-hidden="true"></span>
+                <span id="status-text">CONNECTING…</span>
+            </div>
+
+            <!-- roster not yet imported -->
+            <section class="ta-admin-card ta-admin-card--setup" id="setup-card" hidden>
+                <div class="ta-admin-label">INITIAL SETUP</div>
+                <h2 class="ta-admin-h2">IMPORT EXISTING ROSTER</h2>
+                <p class="ta-admin-p">
+                    The database roster is empty. Import the current on-site roster (years 2025–2026) from the static archive.
+                    Years that already contain roster records are never overwritten, and a partial import is safe to retry.
+                </p>
+                <div class="ta-setup-row">
+                    <button class="ta-btn ta-btn--primary" type="button" id="btn-import">
+                        <span class="ta-btn-label">IMPORT STATIC ROSTER</span>
+                    </button>
+                    <span class="ta-setup-note" id="import-note"></span>
+                </div>
+                <div class="ta-alert ta-alert--error" id="import-error" role="alert" hidden></div>
+            </section>
+
+            <div class="ta-admin-layout" id="console-body" hidden>
+                <!-- year rail -->
+                <nav class="ta-admin-rail" id="year-rail" aria-label="Team years"></nav>
+
+                <div class="ta-admin-main">
+                    <!-- year header -->
+                    <div class="ta-admin-yearhead">
+                        <div>
+                            <div class="ta-admin-label" id="year-label-line"></div>
+                            <h2 class="ta-admin-h2" id="year-title"></h2>
+                        </div>
+                        <button class="ta-btn ta-btn--primary" type="button" id="btn-add">
+                            <span class="ta-btn-label">+ ADD MEMBER</span>
+                        </button>
+                    </div>
+
+                    <!-- roster table -->
+                    <div class="ta-admin-tablewrap" tabindex="0" aria-label="Roster for selected year">
+                        <table class="ta-admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">NAME</th>
+                                    <th scope="col">ROLES</th>
+                                    <th scope="col">DEPARTMENTS</th>
+                                    <th scope="col">TIER</th>
+                                    <th scope="col">PORTAL LINK</th>
+                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="roster-tbody"></tbody>
+                        </table>
+                        <div class="ta-admin-empty" id="roster-empty" hidden>
+                            No roster records for this year yet.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ MEMBER EDIT DIALOG ============ -->
+    <div class="ta-modal-backdrop" id="modal-backdrop" hidden></div>
+    <div class="ta-modal" id="member-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+        <form class="ta-modal-form" id="member-form" novalidate>
+            <div class="ta-modal-head">
+                <div>
+                    <div class="ta-admin-label" id="modal-kicker">ROSTER ENTRY</div>
+                    <h2 class="ta-admin-h2" id="modal-title">ADD MEMBER</h2>
+                </div>
+                <button class="ta-modal-close" type="button" id="modal-close" aria-label="Close dialog">✕</button>
+            </div>
+
+            <div class="ta-modal-grid">
+                <div class="ta-field ta-field--full">
+                    <label class="ta-field-label" for="f-name">NAME *</label>
+                    <input class="ta-input" id="f-name" type="text" required maxlength="120" autocomplete="off">
+                </div>
+                <div class="ta-field ta-field--full">
+                    <label class="ta-field-label">ROLES / DESIGNATIONS * <span class="ta-field-hint">first role is the primary — shown under the name on the public page</span></label>
+                    <div class="ta-role-editor" id="role-editor">
+                        <div class="ta-role-rows" id="role-rows"></div>
+                        <div class="ta-role-add">
+                            <input class="ta-input" id="role-add-input" type="text" placeholder="Type a role and press Enter…" maxlength="80" autocomplete="off">
+                            <button class="ta-btn ta-btn--ghost" type="button" id="role-add-btn">+ ADD</button>
+                        </div>
+                        <div class="ta-role-note" id="role-add-note" role="status" hidden></div>
+                        <div class="ta-role-suggest" id="role-suggest" hidden></div>
+                    </div>
+                </div>
+                <div class="ta-field">
+                    <label class="ta-field-label" for="f-tier">LEADERSHIP TIER *</label>
+                    <select class="ta-input" id="f-tier" required>
+                        <option value="member">MEMBER — collective wall</option>
+                        <option value="dept">DEPT — department head / co-head</option>
+                        <option value="core">CORE — captain / vice / treasurer / C.T.O.</option>
+                        <option value="mentor">MENTOR — guidance section</option>
+                    </select>
+                </div>
+                <div class="ta-field">
+                    <label class="ta-field-label" for="f-rank">RANK <span class="ta-field-hint">core only</span></label>
+                    <select class="ta-input" id="f-rank">
+                        <option value="">—</option>
+                        <option value="captain">CAPTAIN</option>
+                        <option value="vice">VICE-CAPTAIN</option>
+                        <option value="treasurer">TREASURER</option>
+                        <option value="cto">C.T.O.</option>
+                    </select>
+                </div>
+                <div class="ta-field ta-field--full">
+                    <label class="ta-field-label">DEPARTMENTS *</label>
+                    <div class="ta-checkrow" id="dept-checks" role="group" aria-label="Departments"></div>
+                </div>
+                <div class="ta-field">
+                    <label class="ta-field-label" for="f-photo">PORTRAIT URL <span class="ta-field-hint">optional</span></label>
+                    <input class="ta-input" id="f-photo" type="url" placeholder="https://…" autocomplete="off">
+                </div>
+                <div class="ta-field">
+                    <label class="ta-field-label" for="f-photo-base">LOCAL PHOTO STEM <span class="ta-field-hint">optional</span></label>
+                    <input class="ta-input" id="f-photo-base" type="text" placeholder="e.g. mayank-verma" autocomplete="off">
+                </div>
+                <div class="ta-field ta-field--full">
+                    <label class="ta-field-label" for="f-link">LINKED PORTAL ACCOUNT <span class="ta-field-hint">optional — removal deactivates it</span></label>
+                    <select class="ta-input" id="f-link">
+                        <option value="">— none —</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ta-alert ta-alert--error" id="form-error" role="alert" hidden></div>
+
+            <div class="ta-modal-foot">
+                <button class="ta-btn ta-btn--ghost" type="button" id="modal-cancel">CANCEL</button>
+                <button class="ta-btn ta-btn--primary" type="submit" id="modal-save">
+                    <span class="ta-btn-label">SAVE ENTRY</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ============ REMOVE CONFIRM DIALOG ============ -->
+    <div class="ta-modal ta-modal--confirm" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" hidden>
+        <div class="ta-modal-head">
+            <div>
+                <div class="ta-admin-label" style="color: var(--color-danger, #ff5d5d)">DESTRUCTIVE ACTION</div>
+                <h2 class="ta-admin-h2" id="confirm-title">REMOVE MEMBER</h2>
+            </div>
+        </div>
+        <p class="ta-admin-p" id="confirm-text"></p>
+        <ul class="ta-confirm-list" id="confirm-effects"></ul>
+        <div class="ta-alert ta-alert--error" id="confirm-error" role="alert" hidden></div>
+        <div class="ta-modal-foot">
+            <button class="ta-btn ta-btn--ghost" type="button" id="confirm-cancel">CANCEL</button>
+            <button class="ta-btn ta-btn--danger" type="button" id="confirm-ok">
+                <span class="ta-btn-label">CONFIRM REMOVAL</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="ta-toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <noscript>
+        <div class="ta-admin-root" style="padding:120px 20px; text-align:center;">
+            The roster console requires JavaScript. Enable it to continue.
+        </div>
+    </noscript>
+
+    <script type="module" src="/src/team-admin.ts"></script>
+</body>
+</html>

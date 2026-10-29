@@ -278,15 +278,6 @@
     letter-spacing: -0.03em;
 }
 
-.ta-year-chapter {
-    margin-top: 14px;
-    font-family: 'Kanit', sans-serif;
-    font-size: clamp(11px, 1.2vw, 13px);
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: var(--ta-accent);
-}
-
 .ta-stage-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -20,9 +20,10 @@ import { Flip } from 'gsap/Flip';
 import type Lenis from 'lenis';
 import { TEAMS, YEARS, DEFAULT_YEAR, DEPT_LABELS, DEPT_CODES, portrait, groupPhoto } from './data/team-data';
 import { PHOTO_SLUGS } from './data/photo-manifest';
-import type { Member, DeptKey } from './data/team-data';
-import { SYSTEM_CAPABILITIES } from './data/system-capabilities';
+import type { Member, DeptKey, TeamYear } from './data/team-data';
+import { SYSTEM_CAPABILITIES, setActiveRosterSource } from './data/system-capabilities';
 import { TOOLCHAIN_CATEGORIES_ARRAY } from './data/toolchain-data';
+import { fetchPublicRoster } from './lib/roster';
 
 gsap.registerPlugin(ScrollTrigger, Flip);
 
@@ -45,15 +46,22 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 const photoSlug = (m: Member): string =>
   m.photoBase ?? m.name.trim().replace(/['’]/g, '').replace(/\s+/g, '-').toLowerCase();
 
-/** true when an optimized portrait file exists for this member */
-const hasPhoto = (m: Member): boolean => PHOTO_SLUGS.includes(photoSlug(m));
+/** true when a portrait exists for this member — remote URL, or a
+ *  local optimized asset whose slug is in the manifest */
+const hasPhoto = (m: Member): boolean =>
+  (!!m.photoUrl && /^https?:\/\//i.test(m.photoUrl)) || PHOTO_SLUGS.includes(photoSlug(m));
 
 /** responsive <img> for a member portrait */
 const imgFor = (m: Member): HTMLImageElement => {
   const img = document.createElement('img');
-  const p = portrait(m);
-  img.src = p.src;
-  img.srcset = p.srcset;
+  if (m.photoUrl && /^https?:\/\//i.test(m.photoUrl)) {
+    img.src = m.photoUrl;
+    img.removeAttribute('srcset');
+  } else {
+    const p = portrait(m);
+    img.src = p.src;
+    img.srcset = p.srcset;
+  }
   img.sizes = '(min-width: 900px) 260px, 40vw';
   img.alt = m.name;
   img.loading = 'lazy';
@@ -89,6 +97,10 @@ const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matc
 /* module state                                                        */
 /* ------------------------------------------------------------------ */
 
+/** live roster — static team-data until the database answers */
+let teams: Record<number, TeamYear> = TEAMS;
+let years: number[] = YEARS;
+
 let activeYear = DEFAULT_YEAR;
 let activeDept: DeptKey | 'all' = 'all';
 let switching = false;
@@ -103,7 +115,7 @@ function renderRail(): void {
   if (!rail) return;
 
   rail.innerHTML = '';
-  YEARS.forEach((y) => {
+  years.forEach((y) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'ta-year-item';
@@ -119,18 +131,18 @@ function updateRail(): void {
   const rail = $('#ta-rail');
   if (!rail) return;
   const items = Array.from(rail.children) as HTMLButtonElement[];
-  const idx = YEARS.indexOf(activeYear);
+  const idx = years.indexOf(activeYear);
 
   items.forEach((b) => {
     const y = Number(b.textContent);
-    const d = Math.abs(YEARS.indexOf(y) - idx);
+    const d = Math.abs(years.indexOf(y) - idx);
     b.classList.toggle('is-active', y === activeYear);
     b.dataset.near = String(Math.min(d, 2));
     b.setAttribute('aria-current', y === activeYear ? 'true' : 'false');
   });
 
   const count = $('#ta-rail-count');
-  if (count) count.textContent = `GENERATION ${pad2(idx + 1)} / ${pad2(YEARS.length)}`;
+  if (count) count.textContent = `GENERATION ${pad2(idx + 1)} / ${pad2(years.length)}`;
 
   const activeBtn = items.find((b) => Number(b.textContent) === activeYear);
   activeBtn?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
@@ -145,15 +157,14 @@ function setText(sel: string, text: string): void {
   if (node) node.textContent = text;
 }
 
-function deptCount(team: typeof TEAMS[number]): number {
+function deptCount(team: TeamYear): number {
   const set = new Set<string>();
   team.members.forEach((m) => m.departments.forEach((d) => { if (d !== 'mentor') set.add(d); }));
   return set.size;
 }
 
-function renderStage(team: typeof TEAMS[number]): void {
+function renderStage(team: TeamYear): void {
   setText('#ta-year-num', String(team.year));
-  setText('#ta-year-chapter', team.label);
   setText('#ta-stage-ghost', String(team.year));
   setText('#ta-stat-year', String(team.year));
   setText('#ta-stat-members', pad2(team.members.filter((m) => m.tier !== 'mentor').length));
@@ -186,19 +197,32 @@ function renderStage(team: typeof TEAMS[number]): void {
   }
 }
 
-/** group-photo bases that exist as optimized assets */
-const GROUP_PHOTOS = new Set(['team-2025', 'team-2022', 'team-robocon-2012', 'team-robocon-2019']);
+/** group-photo bases that exist as optimized assets (2026 = provisional workshop stand-in) */
+const GROUP_PHOTOS = new Set(['team-2025', 'team-2022', 'team-robocon-2012', 'team-robocon-2019', 'team-2026']);
 
 /* ------------------------------------------------------------------ */
 /* 04 — GUIDANCE                                                       */
 /* ------------------------------------------------------------------ */
 
-function renderGuidance(team: typeof TEAMS[number]): void {
+function renderGuidance(): void {
   const section = $('#ta-guidance');
   const flow = $('#ta-guidance-flow');
   if (!section || !flow) return;
 
-  const mentors = team.members.filter((m) => m.tier === 'mentor');
+  // guidance is institution-level, not per-generation: every mentor on
+  // record across all years, deduped by name — the section stays constant
+  // even when a generation's own roster carries no mentor entries
+  const seen = new Set<string>();
+  const mentors: Member[] = [];
+  years.forEach((y) => {
+    (teams[y]?.members ?? []).forEach((m) => {
+      if (m.tier === 'mentor' && !seen.has(m.name)) {
+        seen.add(m.name);
+        mentors.push(m);
+      }
+    });
+  });
+
   section.hidden = mentors.length === 0;
   if (mentors.length === 0) return;
 
@@ -229,7 +253,7 @@ function rolesList(m: Member, cls: string): HTMLElement {
 /* 05 — LEADERSHIP                                                     */
 /* ------------------------------------------------------------------ */
 
-function renderLeadership(team: typeof TEAMS[number]): void {
+function renderLeadership(team: TeamYear): void {
   const section = $('#ta-lead');
   const coreFlow = $('#ta-core-flow');
   const deptFlow = $('#ta-dept-flow');
@@ -274,7 +298,7 @@ function leadItem(m: Member, idx: string): HTMLElement {
 /* 06+07 — COLLECTIVE WALL + FILTER (departments[] membership)         */
 /* ------------------------------------------------------------------ */
 
-function renderFilter(team: typeof TEAMS[number]): void {
+function renderFilter(team: TeamYear): void {
   const bar = $('#ta-filter');
   if (!bar) return;
   bar.innerHTML = '';
@@ -310,7 +334,7 @@ function updateFilterUI(): void {
   });
 }
 
-function renderWall(team: typeof TEAMS[number]): void {
+function renderWall(team: TeamYear): void {
   const section = $('#ta-collective');
   const wall = $('#ta-wall');
   if (!section || !wall) return;
@@ -391,7 +415,7 @@ function applyFilter(animate: boolean): void {
 /* 10 — END OF ARCHIVE                                                 */
 /* ------------------------------------------------------------------ */
 
-function renderEnd(team: typeof TEAMS[number]): void {
+function renderEnd(team: TeamYear): void {
   const yearEl = $('#ta-end-year');
   if (yearEl) yearEl.innerHTML = `${team.year}<span class="ta-dot">.</span>`;
 
@@ -399,9 +423,9 @@ function renderEnd(team: typeof TEAMS[number]): void {
   if (!nav) return;
   nav.innerHTML = '';
 
-  const idx = YEARS.indexOf(team.year);
-  const prev = YEARS[idx - 1];
-  const next = YEARS[idx + 1];
+  const idx = years.indexOf(team.year);
+  const prev = years[idx - 1];
+  const next = years[idx + 1];
 
   if (prev === undefined && next === undefined) {
     nav.append(el('ta-end-none', 'FIRST CHAPTER — MORE GENERATIONS TO COME'));
@@ -431,12 +455,12 @@ function endLink(dir: string, year: number): HTMLButtonElement {
 /* ------------------------------------------------------------------ */
 
 async function switchYear(year: number): Promise<void> {
-  if (switching || year === activeYear || !TEAMS[year]) return;
+  if (switching || year === activeYear || !teams[year]) return;
   switching = true;
 
   try {
     const overlay = $('#ta-switch');
-    const team = TEAMS[year];
+    const team = teams[year];
     const bar = $('#ta-bar');
     const animate = !!overlay && !reduced();
 
@@ -494,7 +518,6 @@ function playYearIntro(first: boolean): void {
   if (reduced()) return;
 
   const yearMask = $('#ta-year-num');
-  const chapter = $('#ta-year-chapter');
   const stats = document.querySelectorAll<HTMLElement>('.ta-stat');
   const photo = $('#ta-stage-photo');
   const leadPhotos = document.querySelectorAll<HTMLElement>('.ta-lead-photo');
@@ -504,7 +527,6 @@ function playYearIntro(first: boolean): void {
 
   gsap.timeline({ defaults: { ease: 'power4.out' } })
     .fromTo(yearMask, { yPercent: 110 }, { yPercent: 0, duration: 0.85 }, 0)
-    .fromTo(chapter, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5 }, 0.2)
     .fromTo(stats, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.05 }, 0.25)
     .fromTo(photo, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 0.75, ease: 'power3.inOut' }, 0.18)
     .fromTo(leadPhotos, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 0.75, stagger: 0.06, ease: 'power3.inOut' }, 0.3)
@@ -622,13 +644,20 @@ function initRailDrag(): void {
     const btn = (e.target as HTMLElement | null)?.closest?.('.ta-year-item') as HTMLElement | null;
     if (!btn) return;
     const y = Number((btn.textContent ?? '').trim());
-    if (Number.isFinite(y) && TEAMS[y]) void switchYear(y);
+    if (Number.isFinite(y) && teams[y]) void switchYear(y);
   });
 }
 
 /* ------------------------------------------------------------------ */
 /* 07 — CAPABILITIES (WHAT WE BUILD)                                   */
 /* ------------------------------------------------------------------ */
+
+// capabilities/toolchain DOM setup must run ONCE — renderAll() runs on
+// every year switch, and re-running this would duplicate the toolchain
+// categories, stack click listeners and stack ScrollTriggers (distorted
+// layout). Detail panels read the live roster at click time, so nothing
+// goes stale by initializing only once.
+let capabilitiesInitialized = false;
 
 function initCapabilities(): void {
   const capabilitiesSection = $('#ta-capabilities');
@@ -641,6 +670,8 @@ function initCapabilities(): void {
   const systemMembers = $('#ta-system-members');
 
   if (!capabilitiesSection) return;
+  if (capabilitiesInitialized) return;
+  capabilitiesInitialized = true;
 
   // Show capabilities section
   capabilitiesSection.hidden = false;
@@ -735,6 +766,9 @@ function initToolchain(): void {
   const toolchainCategories = $('#ta-toolchain-categories');
 
   if (!toolchainSection || !toolchainCategories) return;
+  // render once — callers guard against re-init, but keep this safe if
+  // ever called directly: never duplicate category blocks
+  if (toolchainCategories.childElementCount > 0) return;
 
   // Show toolchain section
   toolchainSection.hidden = false;
@@ -776,10 +810,10 @@ function initToolchain(): void {
 /* RENDER ALL                                                          */
 /* ------------------------------------------------------------------ */
 
-function renderAll(team: typeof TEAMS[number]): void {
+function renderAll(team: TeamYear): void {
   renderRail();
   renderStage(team);
-  renderGuidance(team);
+  renderGuidance();
   renderLeadership(team);
   renderFilter(team);
   renderWall(team);
@@ -810,7 +844,9 @@ export function initTeamArchive(lenis: Lenis | null): void {
   if (!$('#ta-rail')) return;   // not the team page
   lenisRef = lenis;
 
-  renderAll(TEAMS[DEFAULT_YEAR]);
+  // 1. paint immediately from the static roster — the page works
+  //    before Supabase is configured or the import has run
+  renderAll(teams[DEFAULT_YEAR] ?? teams[YEARS[YEARS.length - 1]]);
   activeYear = DEFAULT_YEAR;
   activeDept = 'all';
 
@@ -819,5 +855,33 @@ export function initTeamArchive(lenis: Lenis | null): void {
   initRailDrag();
   playYearIntro(true);
 
+  ScrollTrigger.refresh();
+
+  // 2. ask the database for the authoritative roster. On success it
+  //    REPLACES the static data — including years where an admin has
+  //    removed members (an empty year stays empty; no silent fallback).
+  void loadDatabaseRoster();
+}
+
+/** fetch the DB roster and swap it in when it is authoritative */
+async function loadDatabaseRoster(): Promise<void> {
+  const result = await fetchPublicRoster();
+  if (result.source !== 'database') return;   // not configured / failed / empty → keep static
+
+  // don't fight an in-flight year-switch animation
+  if (switching) {
+    setTimeout(() => void loadDatabaseRoster(), 150);
+    return;
+  }
+
+  teams = result.teams;
+  years = result.years;
+  setActiveRosterSource(teams);   // capabilities section reads the same source
+
+  // keep the visitor's year when it still exists; otherwise land on the latest
+  const target = teams[activeYear] ? activeYear : years[years.length - 1];
+  activeYear = target;
+  activeDept = 'all';
+  renderAll(teams[target]);
   ScrollTrigger.refresh();
 }

@@ -33,6 +33,10 @@ export interface Member {
   rank?: 'captain' | 'vice' | 'treasurer' | 'cto';
   photoBase?: string;
   objectPosition?: string;
+  /** full remote portrait URL (database roster) — takes precedence over photoBase */
+  photoUrl?: string;
+  /** link to an internal portal account (database roster only) */
+  memberId?: string;
 }
 
 export interface TeamYear {
@@ -85,8 +89,8 @@ export const groupPhoto = (base: string): { src: string; srcset: string } => {
 export const TEAMS: Record<number, TeamYear> = {
   2025: {
     year: 2025,
-    label: 'THE CURRENT MACHINE',
-    status: 'ACTIVE',
+    label: 'THE PREVIOUS MACHINE',
+    status: 'ARCHIVED',
     teamPhotoBase: 'team-2025',
     members: [
       // ---- guidance ----
@@ -142,8 +146,8 @@ export const TEAMS: Record<number, TeamYear> = {
 
   2026: {
     year: 2026,
-    label: 'THE NEXT GENERATION',
-    status: 'IN DEVELOPMENT',
+    label: 'THE CURRENT MACHINE',
+    status: 'ACTIVE',
     teamPhotoBase: 'team-2026',
     members: [
       // ---- core leadership (equal weight) ----
@@ -176,4 +180,5 @@ export const TEAMS: Record<number, TeamYear> = {
 /** Years sorted ascending — the archive rail order */
 export const YEARS: number[] = Object.keys(TEAMS).map(Number).sort((a, b) => a - b);
 
-export const DEFAULT_YEAR = 2025;
+/** The year the Team page opens on — the current generation */
+export const DEFAULT_YEAR = 2026;

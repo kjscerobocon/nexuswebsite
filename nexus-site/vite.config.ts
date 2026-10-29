@@ -21,11 +21,16 @@ export default defineConfig({
         // legacy URL — meta-refresh stub forwarding to automation.html
         'image-processing-redirect': './image-processing.html',
         management: './management.html',
+        // NEXUS NOW stories — permanent retrospective pages
+        'nexus-now/kynex-26': './nexus-now/kynex-26.html',
+        'nexus-now/la-casa-de-bots': './nexus-now/la-casa-de-bots.html',
         // Internal Portal Pages
         'portal/login': './portal/login.html',
         'portal/scan': './portal/scan.html',
         'portal/member': './portal/member.html',
         'portal/admin': './portal/admin.html',
+        // Team roster admin console (Supabase Auth + RLS)
+        'portal/team-admin': './portal/team-admin.html',
       },
     },
   },

@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS NOW | TEAM NEXUS ROBOTICS</title>
-    <meta name="description" content="Current campaigns, build logs and KYNEX '26 — our robotics competition with Robo Sumo and Line Following events. Prizes up to ₹70,000.">
+    <meta name="description" content="What NEXUS Robotics is doing right now — current builds, recruitment, accolades, announcements and permanent stories: KYNEX '26 and La Casa De Bots.">
     <!-- Canonical + social unfurl (WhatsApp / LinkedIn / Twitter) -->
     <link rel="canonical" href="https://nexus-site-olive.vercel.app/nexus-now.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NEXUS ROBOTICS">
-    <meta property="og:title" content="NEXUS NOW — Live Operations & KYNEX '26">
-    <meta property="og:description" content="Current campaigns, build logs and KYNEX '26 — our robotics competition with Robo Sumo and Line Following events. Prizes up to ₹70,000.">
+    <meta property="og:title" content="NEXUS NOW — Live Operations & Stories">
+    <meta property="og:description" content="What the team is doing right now — current builds, recruitment, accolades, announcements and the permanent story archive.">
     <meta property="og:url" content="https://nexus-site-olive.vercel.app/nexus-now.html">
     <meta property="og:image" content="https://nexus-site-olive.vercel.app/Images/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="NEXUS ROBOTICS — K J Somaiya School of Engineering">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="NEXUS NOW — Live Operations & KYNEX '26">
-    <meta name="twitter:description" content="Current campaigns, build logs and KYNEX '26 — our robotics competition with Robo Sumo and Line Following events. Prizes up to ₹70,000.">
+    <meta name="twitter:title" content="NEXUS NOW — Live Operations & Stories">
+    <meta name="twitter:description" content="What the team is doing right now — current builds, recruitment, accolades, announcements and the permanent story archive.">
     <meta name="twitter:image" content="https://nexus-site-olive.vercel.app/Images/og-image.png">
 
     <link rel="icon" type="image/png" sizes="64x64" href="/Images/favicon.png">
@@ -35,313 +35,88 @@
     <!-- GLOBAL NAVBAR — one component, mounted by the root entry (src/main.ts) -->
     <div id="gn-root"></div>
 
-    <!-- SECTION 01 — LIVE OPERATIONS HERO -->
+    <!-- ============ 01 / HERO — WHAT IS NEXUS DOING RIGHT NOW ============ -->
     <header class="nn-hero">
-        <div class="nn-hero-grid">
-            <div class="nn-hero-type">
-                <span class="nn-eyebrow">02 / LIVE OPERATIONS</span>
-                <h1>NEXUS NOW</h1>
-                <p class="nn-supporting">CURRENT SYSTEMS / ACTIVE CAMPAIGNS / UPCOMING OPERATIONS</p>
+        <div class="nn-hero-inner">
+            <div class="nn-hero-meta">
+                <span>02 / NEXUS NOW</span>
+                <span class="nn-divider">//</span>
+                <span class="nn-live-flag"><span class="nn-dot"></span>LIVE</span>
+                <span class="nn-divider">//</span>
+                <span>THE TEAM IS MOVING</span>
             </div>
-            <div class="nn-hero-media">
-                <a href="/KYNEX-26 Material/poster-1600.webp" target="_blank" rel="noopener" title="Open KYNEX '26 poster" class="nn-hero-poster">
-                    <img src="/KYNEX-26 Material/poster-900.webp" alt="KYNEX '26 official poster — Robo Sumo and Line Following Bot, 26 September 2026" loading="eager" width="900" height="1273">
-                </a>
-                <div class="nn-hero-bg"></div>
-            </div>
+            <h1>WHAT'S<br>HAPPENING<br>INSIDE NEXUS.</h1>
+            <p class="nn-hero-sub">
+                The live log of NEXUS Robotics — current builds, recruitment,
+                accolades and announcements, plus the permanent stories of what
+                the team has done.
+            </p>
+            <span class="nn-hero-clock" id="nn-clock" aria-label="Current time, Indian Standard Time">--:--:-- IST</span>
         </div>
     </header>
 
-    <!-- SECTION 02 — KYNEX CAMPAIGN: ACTIVE OPERATION -->
-    <section class="kynex-campaign" id="kynex-campaign" data-campaign="kynex">
-        <!-- CAMPAIGN DETECTION HERO -->
-        <div class="kynex-hero">
-            <div class="kynex-system-metadata">
-                <span class="kynex-system-label">NEXUS NOW</span>
-                <span class="kynex-system-divider">//</span>
-                <span class="kynex-system-status">CAMPAIGN DETECTED</span>
-                <span class="kynex-status-indicator"></span>
-            </div>
-
-            <div class="kynex-title-section">
-                <h1 class="kynex-title">KYNEX</h1>
-                <p class="kynex-tagline">TWO ROBOTICS COMPETITIONS. ONE EPIC EVENT.</p>
-            </div>
-
-            <div class="kynex-key-info">
-                <div class="kynex-info-item">
-                    <span class="kynex-info-label">EVENT DATE</span>
-                    <span class="kynex-info-value">26 SEPTEMBER 2026</span>
-                </div>
-                <div class="kynex-info-item">
-                    <span class="kynex-info-label">PRIZE POOL</span>
-                    <span class="kynex-info-value">UP TO ₹70,000</span>
-                </div>
-            </div>
-
-            <div class="kynex-primary-cta">
-                <a href="https://scan.page/rTay6l" target="_blank" rel="noopener" class="kynex-btn kynex-btn--primary" data-cta="register">REGISTER NOW</a>
-                <a href="#rulebooks" class="kynex-btn kynex-btn--secondary" data-cta="rulebook">VIEW RULEBOOK</a>
-            </div>
-        </div>
-
-        <!-- EVENT STATUS MODULE -->
-        <div class="kynex-status-module">
-            <div class="kynex-status-header">
-                <span class="kynex-status-title">EVENT STATUS</span>
-            </div>
-            <div class="kynex-status-grid">
-                <div class="kynex-status-item">
-                    <span class="kynex-status-label">REGISTRATION</span>
-                    <span class="kynex-status-value kynex-status-value--active">OPEN</span>
-                </div>
-                <div class="kynex-status-item">
-                    <span class="kynex-status-label">CAMPAIGN</span>
-                    <span class="kynex-status-value">KYNEX</span>
-                </div>
-                <div class="kynex-status-item">
-                    <span class="kynex-status-label">DATE</span>
-                    <span class="kynex-status-value">26 SEPTEMBER 2026</span>
-                </div>
-                <div class="kynex-status-item">
-                    <span class="kynex-status-label">PRIZE POOL</span>
-                    <span class="kynex-status-value">UP TO ₹70,000</span>
-                </div>
-            </div>
-            <div class="kynex-countdown" id="kynex-countdown">
-                <span class="kynex-countdown-label">EVENT IN:</span>
-                <div class="kynex-countdown-timer">
-                    <span class="kynex-countdown-value" data-unit="days">00</span>
-                    <span class="kynex-countdown-sep">:</span>
-                    <span class="kynex-countdown-value" data-unit="hours">00</span>
-                    <span class="kynex-countdown-sep">:</span>
-                    <span class="kynex-countdown-value" data-unit="minutes">00</span>
-                    <span class="kynex-countdown-sep">:</span>
-                    <span class="kynex-countdown-value" data-unit="seconds">00</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- COMPETITION SELECTION -->
-        <div class="kynex-competitions" id="rulebooks">
-            <div class="kynex-sec-head">
-                <span class="kynex-sec-index">03</span>
-                <span class="kynex-sec-title">CHOOSE YOUR BATTLE</span>
-                <span class="kynex-sec-rule"></span>
-            </div>
-
-            <div class="kynex-competition-grid">
-                <!-- ROBO SUMO -->
-                <div class="kynex-competition kynex-competition--sumo" data-competition="sumo">
-                    <div class="kynex-competition-decor">
-                        <div class="kynex-sumo-pattern"></div>
-                    </div>
-                    <div class="kynex-competition-content">
-                        <h3 class="kynex-competition-title">ROBO SUMO</h3>
-                            <p class="kynex-competition-tagline">BUILD. PUSH. DOMINATE.</p>
-                            <div class="kynex-competition-details">
-                                <p>Heavy mechanical combat where robots push opponents out of the ring. Requires torque, power and strategic engineering.</p>
-                                <ul class="kynex-spec-list">
-                                    <li><span class="kynex-spec-num">300 × 300 × 300</span> mm max, <span class="kynex-spec-num">5 kg</span>, zero tolerance</li>
-                                    <li>Manual control — wired (3 m slack tether) or wireless</li>
-                                    <li>4 rounds + tiebreaker, one 3-min technical timeout</li>
-                                    <li>Ring-out = outright win; else zone points (100 / 50 / 25)</li>
-                                </ul>
-                            </div>
-                            <div class="kynex-competition-cta">
-                                <a href="https://scan.page/rTay6l" target="_blank" rel="noopener" class="kynex-btn kynex-btn--small" data-cta="sumo-register">REGISTER FOR ROBO SUMO</a>
-                                <a href="/KYNEX-26 Material/SUMO RULEBOOK.pdf" target="_blank" rel="noopener" class="kynex-btn kynex-btn--ghost" data-cta="sumo-rulebook">VIEW RULEBOOK</a>
-                            </div>
-                    </div>
-                </div>
-
-                <!-- LINE FOLLOWING -->
-                <div class="kynex-competition kynex-competition--line" data-competition="line">
-                    <div class="kynex-competition-decor">
-                        <div class="kynex-line-pattern"></div>
-                    </div>
-                    <div class="kynex-competition-content">
-                        <h3 class="kynex-competition-title">LINE FOLLOWING</h3>
-                        <p class="kynex-competition-tagline">DETECT. DECIDE. MOVE.</p>
-                        <div class="kynex-competition-details">
-                            <p>High-speed precision racing where robots follow complex tracks using sensors. Requires intelligence, speed and accuracy.</p>
-                            <ul class="kynex-spec-list">
-                                <li>Fully autonomous — any RC during a run = DQ</li>
-                                <li><span class="kynex-spec-num">250 × 250</span> mm footprint, <span class="kynex-spec-num">250</span> mm height, <span class="kynex-spec-num">1 kg</span></li>
-                                <li>Arduino / ESP32 / STM32 / custom PCB. No kits, no LEGO</li>
-                                <li>3-min run + 45-s calibration. Score = time + 5 s per touch</li>
-                            </ul>
-                        </div>
-                        <div class="kynex-competition-cta">
-                            <a href="https://scan.page/rTay6l" target="_blank" rel="noopener" class="kynex-btn kynex-btn--small" data-cta="line-register">REGISTER FOR LINE FOLLOWING</a>
-                            <a href="/KYNEX-26 Material/LINE FOLLOWER RULEBOOK.pdf" target="_blank" rel="noopener" class="kynex-btn kynex-btn--ghost" data-cta="line-rulebook">VIEW RULEBOOK</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- EVENT PARAMETERS -->
-        <div class="kynex-parameters">
-            <div class="kynex-sec-head">
-                <span class="kynex-sec-index">04</span>
-                <span class="kynex-sec-title">EVENT PARAMETERS</span>
-                <span class="kynex-sec-rule"></span>
-            </div>
-
-            <div class="kynex-params-grid">
-                <div class="kynex-param-item">
-                    <span class="kynex-param-index">01</span>
-                    <div class="kynex-param-content">
-                        <span class="kynex-param-label">DATE</span>
-                        <span class="kynex-param-value">26 SEPTEMBER 2026</span>
-                    </div>
-                </div>
-                <div class="kynex-param-item">
-                    <span class="kynex-param-index">02</span>
-                    <div class="kynex-param-content">
-                        <span class="kynex-param-label">PRIZE POOL</span>
-                        <span class="kynex-param-value">UP TO ₹70,000</span>
-                    </div>
-                </div>
-                <div class="kynex-param-item">
-                    <span class="kynex-param-index">03</span>
-                    <div class="kynex-param-content">
-                        <span class="kynex-param-label">SINGLE ENTRY</span>
-                        <span class="kynex-param-value">₹900</span>
-                    </div>
-                </div>
-                <div class="kynex-param-item">
-                    <span class="kynex-param-index">04</span>
-                    <div class="kynex-param-content">
-                        <span class="kynex-param-label">DUAL ENTRY</span>
-                        <span class="kynex-param-value">₹1,700</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- OFFICIAL POSTER + VENUE -->
-        <div class="kynex-poster">
-            <div class="kynex-sec-head">
-                <span class="kynex-sec-index">05</span>
-                <span class="kynex-sec-title">OFFICIAL TRANSMISSION</span>
-                <span class="kynex-sec-rule"></span>
-            </div>
-            <div class="kynex-poster-grid">
-                <figure class="kynex-poster-frame">
-                    <a href="/KYNEX-26 Material/KYNEX_26_Official Poster.webp" target="_blank" rel="noopener" title="Open full poster">
-                        <img src="/KYNEX-26 Material/poster-900.webp" alt="KYNEX '26 official poster — Robo Sumo and Line Following Bot, 26 September 2026, prizes up to ₹70,000" loading="lazy" width="900" height="1273">
-                    </a>
-                    <figcaption>OFFICIAL POSTER — KYNEX '26</figcaption>
-                </figure>
-                <div class="kynex-venue">
-                    <h3 class="kynex-venue-title">VENUE &amp; LOGISTICS</h3>
-                    <ul class="kynex-venue-list">
-                        <li><strong>WHERE</strong> KJ Somaiya Vidyavihar University, Vidyavihar, Mumbai — 400077</li>
-                        <li><strong>WHEN</strong> Saturday, 26 September 2026</li>
-                        <li><strong>INSPECTION</strong> Arrive early — bots failing size, weight or weapon checks will not compete</li>
-                        <li><strong>BATTERIES</strong> Keep the pack accessible; it may need to be detached at inspection</li>
-                        <li><strong>PUNCTUALITY</strong> Teams more than 10 minutes late face serious action</li>
-                        <li><strong>RULE CHANGES</strong> Any revisions will be communicated to registered teams before match day</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- WHY KYNEX -->
-        <div class="kynex-about">
-            <div class="kynex-sec-head">
-                <span class="kynex-sec-index">05</span>
-                <span class="kynex-sec-title">MISSION BRIEFING</span>
-                <span class="kynex-sec-rule"></span>
-            </div>
-
-            <div class="kynex-about-content">
-                <h2 class="kynex-about-title">WHY KYNEX?</h2>
-                <div class="kynex-about-text">
-                    <p>KYNEX brings two distinct robotics battles into one arena. Choose your path:</p>
-                    <ul class="kynex-about-list">
-                        <li><strong>ROBO SUMO:</strong> Power and strategy on the 7 ft Dohyo. Build a 5 kg machine that can push, shove and dominate the ring — ring-out wins outright, zone points decide the rest.</li>
-                        <li><strong>LINE FOLLOWING:</strong> Speed, sensing and precision on a confidential 2.5 m track. Engineer a fully autonomous racer that reads the 2 cm line faster and cleaner than anyone else.</li>
-                    </ul>
-                    <p class="kynex-about-cta-text">Two challenges. Two engineering approaches. One epic event.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- FINAL REGISTRATION CTA -->
-        <div class="kynex-final-cta">
-            <div class="kynex-final-content">
-                <h2 class="kynex-final-title">TWO BOTS.</h2>
-                <h2 class="kynex-final-title">TWO BATTLES.</h2>
-                <h2 class="kynex-final-title kynex-final-title--accent">ONE CHAMPION.</h2>
-
-                <div class="kynex-final-meta">
-                    <span class="kynex-final-date">26 SEPTEMBER 2026</span>
-                    <span class="kynex-final-divider">•</span>
-                    <span class="kynex-final-prize">PRIZES WORTH UP TO ₹70,000</span>
-                </div>
-
-                <div class="kynex-final-buttons">
-                    <a href="https://scan.page/rTay6l" target="_blank" rel="noopener" class="kynex-btn kynex-btn--large" data-cta="final-register">ENTER THE ARENA</a>
-                    <a href="#rulebooks" class="kynex-btn kynex-btn--secondary" data-cta="final-rulebook">VIEW OFFICIAL RULEBOOK</a>
-                </div>
-            </div>
-        </div>
-        <!-- CONTACT SECTION -->
-        <div class="kynex-contact">
-            <div class="kynex-sec-head">
-                <span class="kynex-sec-index">06</span>
-                <span class="kynex-sec-title">NEED ASSISTANCE?</span>
-                <span class="kynex-sec-rule"></span>
-            </div>
-
-            <div class="kynex-contact-grid">
-                <div class="kynex-contact-item">
-                    <span class="kynex-contact-name">Paarth Mehta</span>
-                    <a href="tel:+918169524405" class="kynex-contact-phone">+91 81695 24405</a>
-                </div>
-                <div class="kynex-contact-item">
-                    <span class="kynex-contact-name">Arpita Bhalekar</span>
-                    <a href="tel:+919321127041" class="kynex-contact-phone">+91 93211 27041</a>
-                </div>
-                <div class="kynex-contact-item">
-                    <span class="kynex-contact-name">Email</span>
-                    <a href="mailto:nexusrobotics.kjsse@somaiya.edu" class="kynex-contact-phone">nexusrobotics.kjsse@somaiya.edu</a>
-                </div>
-                <div class="kynex-contact-item">
-                    <span class="kynex-contact-name">Any doubts?</span>
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSddxqW865aIJ2p1sqtNFyYtydLoE1eNgPlPpJMYvEolvlijQg/viewform" target="_blank" rel="noopener" class="kynex-contact-phone kynex-contact-link">F&Q FORM ↗</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 03 — OPERATIONS QUEUE -->
-    <section class="nn-operations">
-        <div class="nn-sec-head">
-            <span class="nn-sec-index">03</span>
-            <span class="nn-sec-title">OPERATIONS QUEUE</span>
+    <!-- ============ 02 / LIVE — STATUS CONSOLE ============ -->
+    <section class="nn-live">
+        <div class="nn-sec-head" data-reveal>
+            <span class="nn-sec-index">02</span>
+            <span class="nn-sec-title">CURRENT OPERATIONS</span>
             <span class="nn-sec-rule"></span>
+            <span class="nn-sec-note">SYSTEM STATUS</span>
         </div>
 
-        <div class="nn-ops-queue" id="nn-ops-queue">
-            <!-- Operations populated by JavaScript -->
+        <div class="nn-console-wrap">
+            <div data-reveal>
+                <div class="nn-console" aria-label="Current team status">
+                    <div class="nn-console-bar">
+                        <span class="nn-dot"></span>
+                        <span>NEXUS // NOW — STATUS CONSOLE</span>
+                    </div>
+                    <div id="nn-status-console">
+                        <!-- LIVE rows rendered by src/nexus-now.ts -->
+                    </div>
+                </div>
+            </div>
+
+            <aside class="nn-note" id="nn-status-note" data-reveal aria-live="polite">
+                <span class="nn-note-label" id="nn-status-note-label">OPERATION BRIEF</span>
+                <p class="nn-note-text" id="nn-status-note-text"></p>
+                <a class="nn-note-link" id="nn-status-note-link" href="#" hidden></a>
+            </aside>
+        </div>
+
+        <div class="nn-phase-strip" data-reveal>
+            <span class="nn-phase-strip-label">ROBOCON '26 — BUILD TRACKER</span>
+            <div id="nn-phase-track" aria-label="Robocon 2026 development phases">
+                <!-- phases rendered by src/nexus-now.ts -->
+            </div>
         </div>
     </section>
 
-    <!-- SECTION 04 — FIELD LOG -->
+    <!-- ============ 03 / STORIES — PERMANENT RECORDS ============ -->
+    <section class="nn-stories">
+        <div class="nn-sec-head" data-reveal>
+            <span class="nn-sec-index">03</span>
+            <span class="nn-sec-title">FIELD STORIES</span>
+            <span class="nn-sec-rule"></span>
+            <span class="nn-sec-note">COMPLETED MAJOR ACTIVITIES</span>
+        </div>
+
+        <div class="nn-stories-grid" id="nn-stories-grid">
+            <!-- story cards rendered by src/nexus-now.ts -->
+        </div>
+    </section>
+
+    <!-- ============ 04 / FIELD LOG — THE LIVING TIMELINE ============ -->
     <section class="nn-fieldlog">
-        <div class="nn-sec-head">
+        <div class="nn-sec-head" data-reveal>
             <span class="nn-sec-index">04</span>
             <span class="nn-sec-title">FIELD LOG</span>
             <span class="nn-sec-rule"></span>
-            <span class="nn-sec-note">CHRONOLOGICAL UPDATES</span>
+            <span class="nn-sec-note">LATEST INTELLIGENCE — NEWEST FIRST</span>
         </div>
 
         <div class="nn-timeline" id="nn-timeline">
-            <!-- Field log entries populated by JavaScript -->
+            <!-- field log entries rendered by src/nexus-now.ts -->
         </div>
     </section>
 
@@ -461,7 +236,7 @@
                                 </a>
                             </li>
                             <li class="footer-network-item">
-                                <a href="/portal/login.html" class="footer-network-link">
+                                <a href="/portal/team-admin.html" class="footer-network-link">
                                     <span>ADMIN COMMAND</span>
                                     <span class="footer-network-arrow">→</span>
                                 </a>

@@ -163,7 +163,15 @@ CREATE TABLE IF NOT EXISTS attendance (
 CREATE INDEX IF NOT EXISTS idx_attendance_member ON attendance(member_id);
 CREATE INDEX IF NOT EXISTS idx_attendance_timestamp ON attendance(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_attendance_member_timestamp ON attendance(member_id, timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance((DATE(timestamp)));
+-- NOTE: DATE(timestamptz) is not IMMUTABLE (depends on session timezone)
+-- and Postgres rejects indexing it (42P17). Even the explicit
+-- AT TIME ZONE 'UTC' cast is only STABLE, so wrap it in a helper
+-- explicitly marked IMMUTABLE (safe: UTC bucketing never changes).
+CREATE OR REPLACE FUNCTION attendance_utc_date(ts timestamptz)
+RETURNS date LANGUAGE sql IMMUTABLE AS
+$$ SELECT (ts AT TIME ZONE 'UTC')::date $$;
+
+CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(attendance_utc_date(timestamp));
 
 -- ------------------------------------------------------------
 -- 1.8 SESSIONS TABLE
@@ -579,19 +587,33 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
 
 -- Public can read reference data
+DROP POLICY IF EXISTS "Public read departments" ON departments;
 CREATE POLICY "Public read departments" ON departments FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read roles" ON roles;
 CREATE POLICY "Public read roles" ON roles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read settings" ON settings;
 CREATE POLICY "Public read settings" ON settings FOR SELECT USING (is_public = true);
-CREATE POLICY "Public read campaigns" ON campaigns FOR SELECT USING (is_published = true OR status = 'completed');
+DROP POLICY IF EXISTS "Public read campaigns" ON campaigns;
+CREATE POLICY "Public read campaigns" ON campaigns FOR SELECT USING (status IN ('upcoming', 'active', 'completed'));
+DROP POLICY IF EXISTS "Public read partners" ON partners;
 CREATE POLICY "Public read partners" ON partners FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read gallery" ON gallery;
 CREATE POLICY "Public read gallery" ON gallery FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read team_years" ON team_years;
 CREATE POLICY "Public read team_years" ON team_years FOR SELECT USING (status = 'active');
+DROP POLICY IF EXISTS "Public read team_members" ON team_members;
 CREATE POLICY "Public read team_members" ON team_members FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read competitions" ON competitions;
 CREATE POLICY "Public read competitions" ON competitions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read operations" ON operations;
 CREATE POLICY "Public read operations" ON operations FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read field_logs" ON field_logs;
 CREATE POLICY "Public read field_logs" ON field_logs FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read robots" ON robots;
 CREATE POLICY "Public read robots" ON robots FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read system_capabilities" ON system_capabilities;
 CREATE POLICY "Public read system_capabilities" ON system_capabilities FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read news" ON news_articles;
 CREATE POLICY "Public read news" ON news_articles FOR SELECT USING (is_published = true);
 
 -- Service role (backend) can do everything

@@ -298,12 +298,13 @@ function initCollective(): void {
 function initMachine(): void {
   const img = q('#hp-unit-img');
   if (img) {
-    /* zoom into the workshop through the pass — mechanical detail reveal */
+    /* gentle push-in — kept subtle (1.06) so the full portrait frame
+       stays visible while scrolling (a bigger scale re-crops the photo) */
     gsap.fromTo(
       img,
       { scale: 1 },
       {
-        scale: 1.16,
+        scale: 1.06,
         ease: 'none',
         scrollTrigger: {
           trigger: '.hp-unit-media',
